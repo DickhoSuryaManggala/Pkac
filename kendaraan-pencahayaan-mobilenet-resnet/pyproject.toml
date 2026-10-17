@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vehicle-lighting"
+version = "0.1.0"
+description = "Analisis pengaruh variasi kondisi pencahayaan terhadap generalisasi MobileNetV2 dan ResNet50 pada klasifikasi jenis kendaraan"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "scipy",
+    "opencv-python-headless",
+    "pillow",
+    "pyyaml",
+    "matplotlib",
+    "tqdm",
+    "ijson",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.2", "torchvision>=0.17"]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

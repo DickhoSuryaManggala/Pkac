@@ -1,0 +1,16 @@
+data/raw/
+!data/raw/.gitkeep
+data/processed/
+data/crops/
+data/manifest.csv
+data/dataset_stats.json
+data/bdd100k/
+results/
+!results/.gitkeep
+*.pt
+*.ipynb_checkpoints/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+build/
+.venv/

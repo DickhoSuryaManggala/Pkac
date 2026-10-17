@@ -1,0 +1,62 @@
+# Konfigurasi tunggal eksperimen. Ubah parameter HANYA di berkas ini.
+# Topik: Analisis Pengaruh Variasi Kondisi Pencahayaan terhadap Generalisasi
+#        Model MobileNetV2 dan ResNet50 pada Klasifikasi Jenis Kendaraan.
+project:
+  seeds: [42, 43, 44]          # >= 3 seed agar bisa lapor mean +/- std
+  image_size: 224
+  num_workers: 2
+
+data:
+  # Dataset utama: BDD100K (format deteksi). Crop kendaraan + kondisi pencahayaan
+  # ASLI (timeofday) dibuat oleh scripts/bdd100k_to_dataset.py.
+  raw_dir: data/raw
+  bdd100k:
+    root: ../bdd100k/bdd100k           # relatif ke root proyek, atau path absolut
+    crops_dir: data/crops
+    per_class: 3000                    # maksimum crop per kelas (seimbang)
+    min_box: 32                        # saringan ukuran bbox minimum (piksel)
+    class_map: {car: mobil, motor: sepeda_motor, bus: bus, truck: truk}
+    timeofday_map: {daytime: normal, dawn/dusk: dim, night: low}
+  # "class"          -> data/raw/<kelas>/*.jpg                     (pencahayaan disintesis)
+  # "lighting_class" -> data/raw/<normal|dim|low>/<kelas>/*.jpg    (citra asli per kondisi)
+  raw_layout: lighting_class
+  processed_dir: data/processed
+  manifest: data/manifest.csv
+  classes: [mobil, sepeda_motor, bus, truk]
+  group_regex: null                    # group_id sudah dari bdd100k_to_dataset.py (grup = video id)
+  split: {train: 0.70, val: 0.15, test: 0.15}
+
+lighting:
+  # TIDAK dipakai pada mode BDD100K (raw_layout = lighting_class): kondisi
+  # normal/dim/low berasal dari timeofday asli. Bagian ini hanya untuk mode
+  # pencahayaan sintetis (raw_layout = class).
+  # exposure = pengali cahaya linear; gamma > 1 menggelapkan tonal tengah.
+  levels:
+    normal: {exposure: 1.00, gamma: 1.00}
+    dim:    {exposure: 0.40, gamma: 1.20}
+    low:    {exposure: 0.12, gamma: 1.40}
+  noise_sigma: 0.0            # 0 = noise TIDAK ditambah (pencahayaan diisolasi sebagai variabel)
+  jpeg_quality: 95
+
+train:
+  epochs: 20
+  batch_size: 32
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  warmup_frozen_epochs: 2       # backbone dibekukan N epoch pertama, lalu fine-tune penuh
+  patience: 5                   # early stopping pada val (val = kondisi yang sama dgn train)
+  pretrained: true              # bobot ImageNet (transfer learning)
+  hflip: true
+  random_resized_crop_scale: [0.8, 1.0]
+  brightness_aug_range: [0.10, 1.20]   # hanya untuk regime *_brightaug (log-uniform exposure)
+
+regimes:
+  normal:            {train_lighting: [normal]}                         # skenario A, B, C
+  mixed:             {train_lighting: [normal, dim, low]}               # skenario D
+  normal_brightaug:  {train_lighting: [normal], brightness_aug: true}   # eksperimen lanjutan
+  normal_gamma:      {train_lighting: [normal], enhance: gamma}         # eksperimen lanjutan
+  normal_clahe:      {train_lighting: [normal], enhance: clahe}         # eksperimen lanjutan
+
+models: [mobilenet_v2, resnet50]
+test_lighting: [normal, dim, low]
+results_dir: results

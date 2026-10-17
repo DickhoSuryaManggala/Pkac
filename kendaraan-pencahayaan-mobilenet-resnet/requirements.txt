@@ -1,0 +1,13 @@
+torch>=2.2
+torchvision>=0.17
+numpy
+pandas
+scikit-learn
+scipy
+opencv-python-headless
+pillow
+pyyaml
+matplotlib
+tqdm
+ijson
+pytest

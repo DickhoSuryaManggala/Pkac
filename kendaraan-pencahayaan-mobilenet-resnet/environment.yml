@@ -1,0 +1,31 @@
+# Environment conda untuk proyek ini.
+#   conda env create -f environment.yml
+#   conda activate kendaraan-pencahayaan
+#
+# PyTorch diambil dari channel `pytorch`. Build default mendukung CPU; bila
+# tersedia GPU/CUDA, conda akan memilih build yang sesuai.
+name: kendaraan-pencahayaan
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pytorch>=2.2
+  - torchvision>=0.17
+  - numpy
+  - pandas
+  - scikit-learn
+  - scipy
+  - pyyaml
+  - matplotlib
+  - tqdm
+  - pillow
+  - pytest
+  - jupyterlab
+  - ipykernel
+  - nbformat
+  - pip
+  - pip:
+      - opencv-python-headless
+      - ijson
